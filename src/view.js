@@ -12,7 +12,7 @@ export default class View{
         this.context.fillRect(x * width , y * height, width, height);
         this.context.lineWidth = 2;
         this.context.strokeStyle = 'black';
-        this.context.strokeRect = (x * width ,y * height ,width,height);
+        this.context.strokeRect(x * width ,y * height ,width,height);
        
     };
     render(playfield) {

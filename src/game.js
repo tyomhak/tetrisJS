@@ -4,16 +4,59 @@ export default class Game {
         this.lines = 0;
         this.level = 0;
         this.playfield = this.createPlayField();
+        this.pieceTemplates = [
+                [
+                    [0,1,0],
+                    [1,1,1],
+                    [0,0,0],
+                ],
+                [
+                    [1,1,0],
+                    [0,1,1],
+                    [0,0,0],
+                ],
+                [
+                    [0,1,1],
+                    [1,1,0],
+                    [0,0,0],
+                ],
+                [
+                    [0,1,0],
+                    [0,1,0],
+                    [0,1,0],
+                    [0,1,0],
+                ],
+                [
+                    [0,1,1],
+                    [0,1,0],
+                    [0,1,0],
+                ],
+                [
+                    [1,1,0],
+                    [0,1,0],
+                    [0,1,0],
+                ],
+            ];
+
     this.activePiece = {
             x:0,
             y:0,
-            blocks:[
-                [0,1,0],
-                [1,1,1],
-                [0,0,0],
-            ],
+            blocks:this.getRandomPiece()
         };
+
     };
+
+    getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    };
+
+    getRandomPiece(){
+
+        const numOfShapes = this.pieceTemplates.length
+        let i = this.getRandomInt(numOfShapes); 
+        return this.pieceTemplates[i];
+    };
+
     createPlayField(){
         const playfield = new Array;
         for (let y = 0; y < 20; y++) {
@@ -62,6 +105,7 @@ export default class Game {
         this.activePiece.y += 1;
         if (this.isPieceOutOfBounds(blocks)) this.activePiece.y -= 1;
     };
+    
 
     isPieceOutOfBounds(arr){
         const {y : pieceY,x : pieceX, blocks} = this.activePiece;
@@ -114,5 +158,15 @@ export default class Game {
             console.log('ne povernuta')
         };
     };
+    
+    sleep(milliseconds) {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+            currentDate = Date.now();
+        } while (currentDate - date < milliseconds);
+        this.sleep()
+    };
+
 
 };
