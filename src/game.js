@@ -60,10 +60,16 @@ export default class Game {
                     [0,1,0],
                     [0,1,0],
                 ],
+                [
+                    [1,1,0],
+                    [1,1,0],
+                    [0,0,0],
+                ],
+                
             ];
 
     this.activePiece = {
-            x:0,
+            x:this.getRandomInt(6),
             y:0,
             blocks:this.getRandomPiece()
         };
@@ -103,7 +109,7 @@ export default class Game {
         return playfield;
     };
     newActivePiece(){
-        this.activePiece.x = 0;
+        this.activePiece.x = this.getRandomInt(6);
         this.activePiece.y = 0;
         this.activePiece.blocks = this.getRandomPiece();
     };
@@ -111,9 +117,7 @@ export default class Game {
     getState(){
         //creating new playfield
         const playfield = this.createPlayField();
-
-        const {y : pieceY, x : pieceX , blocks : blocks} = this.activePiece;
-        
+        let {y : pieceY, x : pieceX , blocks : blocks} = this.activePiece;
         //local plafield equal to this.playfield
         for (let y = 0; y < playfield.length; y++) {
             const block = playfield[y];
@@ -122,7 +126,8 @@ export default class Game {
             };
         };
         //adding active piece in playfield using activePiece.x and y coordinates
-        
+        const randomInt  = this.getRandomInt(6);
+
         for (let y = 0; y < blocks.length; y++) {
             for (let x = 0; x < blocks[y].length; x++) {
                 if(blocks[y][x]){
@@ -130,8 +135,7 @@ export default class Game {
                 };
             };
         };
-
-        
+        this.LineCheck();
         return playfield;
     };
 
@@ -151,7 +155,12 @@ export default class Game {
         //moving piece down
         const blocks = this.activePiece.blocks;
         this.activePiece.y += 1;
-        if (this.isPieceOutOfBounds(blocks)) this.activePiece.y -= 1;
+        if (this.isPieceOutOfBounds(blocks)) {
+            this.activePiece.y -= 1;
+            //while piece is on the another piece or if piece is on the bottom
+            //down arrow pressing will immediately lock the piece and call next piece
+            this.lockPiece();
+        };
     };
     
 
@@ -240,5 +249,23 @@ export default class Game {
                 this.lockPiece();
             }
         }, 1000);
+    };
+    // looseCheck(){
+    //     playfield = this.playfield;
+    //     if(playfield[0].includes(1)){
+    //         console.log(true);
+    //         return true;
+    //     };
+    // };
+    LineCheck(){
+        const playfield =  this.playfield
+        for (let y = 0; y < playfield.length; y++) {
+            if (!(playfield[y].includes(0))){
+                playfield.splice(y,1);
+                playfield.unshift([0,0,0,0,0,0,0,0,0,0]);
+                this.lines += 1;
+            };
+        };
+        return playfield;
     };
 };
