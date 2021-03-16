@@ -45,10 +45,10 @@ export default class Game {
                     [0,0,0],
                 ],
                 [
-                    [0,1,0],
-                    [0,1,0],
-                    [0,1,0],
-                    [0,1,0],
+                    [0,0,0,0],
+                    [1,1,1,1],
+                    [0,0,0,0],
+                    [0,0,0,0],
                 ],
                 [
                     [0,1,1],
@@ -60,16 +60,17 @@ export default class Game {
                     [0,1,0],
                     [0,1,0],
                 ],
-                [
-                    [1,1,0],
-                    [1,1,0],
-                    [0,0,0],
+                [   
+                    [0,0,0,0],
+                    [0,1,1,0],
+                    [0,1,1,0],
+                    [0,0,0,0],
                 ],
                 
             ];
 
     this.activePiece = {
-            x:this.getRandomInt(6),
+            x:0,
             y:0,
             blocks:this.getRandomPiece()
         };
@@ -136,6 +137,7 @@ export default class Game {
             };
         };
         this.LineCheck();
+        this.looseCheck();
         return playfield;
     };
 
@@ -202,12 +204,13 @@ export default class Game {
     };
     rotatePiece(piece){
         let resultArray = [];
+        console.log(piece)
         for (let i = 0; i < piece.length; i++) {
             resultArray.push([])
         };
     
         for (let i = piece.length-1; i >= 0; i--) {
-            const element = piece[i]
+            const element = piece[i];
             for (let j = 0; j < element.length; j++) {
                 const element2 = element[j];
                 resultArray[j].push(element2)
@@ -223,10 +226,7 @@ export default class Game {
         const RotatedPiece = this.rotatePiece(blocks);
         
         if(!(this.isPieceOutOfBounds(RotatedPiece))){
-            console.log('povernuta');
             this.activePiece.blocks = RotatedPiece;
-        }else{
-            console.log('ne povernuta')
         };
     };
 
@@ -236,27 +236,23 @@ export default class Game {
     };
 
     moveDownEverySecond() {
-
-
-        let pieceYposition = this.activePiecePositionCheck();
-        setInterval(() =>{
-            pieceYposition = this.activePiecePositionCheck();
-        }, 1000)
         setInterval(() => {
             this.movePieceDown();
-            // if Y position of active piece  isn't increasing by 1 piece's going to be locked on its current position
-            if (pieceYposition == this.activePiecePositionCheck()){
-                this.lockPiece();
-            }
         }, 1000);
     };
-    // looseCheck(){
-    //     playfield = this.playfield;
-    //     if(playfield[0].includes(1)){
-    //         console.log(true);
-    //         return true;
-    //     };
-    // };
+
+    looseCheck(){
+        const playfield = this.playfield;
+        if(playfield[0].includes(1)){
+            console.log(true);
+            this.activePiece.blocks = [
+                                [0,0,0],
+                                [0,0,0],
+                                [0,0,0],
+                                        ];
+        };
+    };
+
     LineCheck(){
         const playfield =  this.playfield
         for (let y = 0; y < playfield.length; y++) {
