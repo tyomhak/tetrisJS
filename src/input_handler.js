@@ -23,7 +23,7 @@ export default class InputHandler {
                     game.blocksRotateToRight();
                     break;
             };
-            view.render(game.getState());
+            view.render(game.getState(), game.getColors());
         });
     };
 };

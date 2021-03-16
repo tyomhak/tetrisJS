@@ -4,6 +4,7 @@ export default class Game {
         this.lines = 9;
         this.level = 0;
         this.speed = 1000;
+        this.colors = ["#990099","#002699","#00f51d", "#f50000"];
     //     this.playfield = [
     //       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -29,6 +30,7 @@ export default class Game {
     //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     // ];
         this.playfield = this.createPlayField();
+        this.playfield_colors = this.createPlayField();
         this.pieceTemplates = [
                 [
                     [0,1,0],
@@ -73,7 +75,8 @@ export default class Game {
     this.activePiece = {
             x:0,
             y:0,
-            blocks:this.getRandomPiece()
+            blocks:this.getRandomPiece(),
+            color:this.getRandomColor()
         };
 
     };
@@ -81,6 +84,10 @@ export default class Game {
     getRandomInt(max) {
         return Math.floor(Math.random() * Math.floor(max));
     };
+
+    getRandomColor(){
+        return this.colors[this.getRandomInt(this.colors.length)]
+    }
 
     getRandomPiece(){
         //Getting random piece in random positition
@@ -114,6 +121,7 @@ export default class Game {
         this.activePiece.x = this.getRandomInt(6);
         this.activePiece.y = 0;
         this.activePiece.blocks = this.getRandomPiece();
+        this.activePiece.color = this.getRandomColor();
     };
 
     getState(){
@@ -143,6 +151,28 @@ export default class Game {
         console.log(this.lines,this.level,this.speed);
         return playfield;
     };
+
+    getColors(){
+        const playfield_col = this.createPlayField();
+
+        let {y : pieceY, x : pieceX , blocks : blocks} = this.activePiece;
+        //local plafield equal to this.playfield
+        for (let y = 0; y < this.playfield_colors.length; y++) {
+            for (let x = 0; x < this.playfield_colors[0].length; x++) {
+                playfield_col[y][x] = this.playfield_colors[y][x];
+            };
+        };
+
+        for (let y = 0; y < blocks.length; y++) {
+            for (let x = 0; x < blocks[y].length; x++) {
+                if(blocks[y][x]){
+                    playfield_col[pieceY+y][pieceX+x] = this.activePiece.color;
+                };
+            };
+        };
+
+        return playfield_col;
+    }
 
     movePieceLeft(){
         //moving piece left 
@@ -198,12 +228,15 @@ export default class Game {
         const playfield = this.playfield;
         for (let y = 0; y < blocks.length; y++) {
             for (let x = 0; x < blocks[y].length; x++) {
-                if(blocks[y][x]) playfield[pieceY + y][pieceX + x]  = blocks[y][x];
+                if(blocks[y][x]) {
+                    playfield[pieceY + y][pieceX + x]  = blocks[y][x];
+                    this.playfield_colors[pieceY + y][pieceX + x] = this.activePiece.color;
+                }
+
             };
             
         };
         this.newActivePiece();
-
     };
     rotatePiece(piece){
         let resultArray = [];

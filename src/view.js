@@ -25,7 +25,7 @@ export default class View{
         this.context.strokeRect(x * width ,y * height ,width,height);
        
     };
-    render(playfield) {
+    render(playfield, playfield_colors) {
         this.clearScreen();
         const color = this.randomColors();
         for (let y = 0; y < playfield.length; y++) {
@@ -33,7 +33,7 @@ export default class View{
             for (let x = 0; x < line.length; x++) {
                 const block = line[x];
                 if (block) {
-                    this.createRect(x,y,this.blockWidth,this.blockHeight,this.randomColors());
+                    this.createRect(x,y,this.blockWidth,this.blockHeight,playfield_colors[y][x]);
                 };  
             };
         };

@@ -18,7 +18,7 @@ window.requestAnimationFrame(gameLoop);
 
 // render loop
 function gameLoop() {
-    view.render(game.getState());
+    view.render(game.getState(), game.getColors());
     window.requestAnimationFrame(gameLoop);
 
 };
