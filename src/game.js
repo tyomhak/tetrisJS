@@ -3,28 +3,31 @@ export default class Game {
         this.score = 0;
         this.lines = 0;
         this.level = 0;
-        this.playfield = [
-          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        , [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-        , [0, 0, 0, 0, 0, 0, 0, 1, 1, 1]
-    ];
+    //     this.playfield = [
+    //       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    // ];
+        this.playfield = this.createPlayField();
         this.pieceTemplates = [
                 [
                     [0,1,0],
@@ -74,13 +77,15 @@ export default class Game {
     getRandomPiece(){
         //Getting random piece in random positition
 
-        const numOfShapes = this.pieceTemplates.length
+        const numOfShapes = this.pieceTemplates.length;
         let i = this.getRandomInt(numOfShapes);
-        let RandomPiece = this.pieceTemplates[i]
+        let RandomPiece = this.pieceTemplates[i];
         let randomInt = this.getRandomInt(3);
+        
         for (let x = 0; x < randomInt; x++) {
             RandomPiece = this.rotatePiece(RandomPiece);
-        }
+        };
+        
         return RandomPiece;
     };
 
@@ -96,6 +101,11 @@ export default class Game {
         };
 
         return playfield;
+    };
+    newActivePiece(){
+        this.activePiece.x = 0;
+        this.activePiece.y = 0;
+        this.activePiece.blocks = this.getRandomPiece();
     };
 
     getState(){
@@ -178,6 +188,7 @@ export default class Game {
             };
             
         };
+        this.newActivePiece();
 
     };
     rotatePiece(piece){
@@ -216,12 +227,15 @@ export default class Game {
     };
 
     moveDownEverySecond() {
+
+
         let pieceYposition = this.activePiecePositionCheck();
         setInterval(() =>{
             pieceYposition = this.activePiecePositionCheck();
         }, 1000)
         setInterval(() => {
             this.movePieceDown();
+            // if Y position of active piece  isn't increasing by 1 piece's going to be locked on its current position
             if (pieceYposition == this.activePiecePositionCheck()){
                 this.lockPiece();
             }
