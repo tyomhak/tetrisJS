@@ -51,13 +51,21 @@ export default class Game {
     };
 
     getRandomPiece(){
+        //Getting random piece in random positition
 
         const numOfShapes = this.pieceTemplates.length
-        let i = this.getRandomInt(numOfShapes); 
-        return this.pieceTemplates[i];
+        let i = this.getRandomInt(numOfShapes);
+        let RandomPiece = this.pieceTemplates[i]
+        let randomInt = this.getRandomInt(3);
+        for (let x = 0; x < randomInt; x++) {
+            RandomPiece = this.rotatePiece(RandomPiece);
+        }
+        return RandomPiece;
     };
 
     createPlayField(){
+        //creating 2d array with 20 rows and 10 columns
+        
         const playfield = new Array;
         for (let y = 0; y < 20; y++) {
             playfield.push(new Array);
@@ -69,23 +77,26 @@ export default class Game {
     };
     
     getState(){
+        //creating new playfield
         const playfield = this.createPlayField();
+
         const {y : pieceY, x : pieceX , blocks : blocks} = this.activePiece;
         
-
+        //local plafield equal to this.playfield
         for (let y = 0; y < playfield.length; y++) {
             const block = playfield[y];
             for (let x = 0; x < block.length; x++) {
                 playfield[y][x] = this.playfield[y][x];
             };
         };
+        //adding active piece in playfield using activePiece.x and y coordinates
+        
         for (let y = 0; y < blocks.length; y++) {
             for (let x = 0; x < blocks[y].length; x++) {
                 if(blocks[y][x]){
                     playfield[pieceY + y][pieceX + x] = blocks[y][x];
                 };
             };
-            
         };
         return playfield;
     };
@@ -134,39 +145,33 @@ export default class Game {
             
         };
     };
-
-    
-    blocksRotateToRight(){
-        let blocks = this.activePiece.blocks
-        let resultArray = []
-        for (let i = 0; i < blocks.length; i++) {
+    rotatePiece(piece){
+        let resultArray = [];
+        for (let i = 0; i < piece.length; i++) {
             resultArray.push([])
         };
     
-        for (let i = blocks.length-1; i >= 0; i--) {
-            const element = blocks[i]
+        for (let i = piece.length-1; i >= 0; i--) {
+            const element = piece[i]
             for (let j = 0; j < element.length; j++) {
                 const element2 = element[j];
                 resultArray[j].push(element2)
             };
         };
+        return resultArray;
+    };
+    
+    blocksRotateToRight(){
+        let blocks = this.activePiece.blocks;
+        let resultArray = [];
+
+        const RotatedPiece = this.rotatePiece(blocks);
         
-        if(!(this.isPieceOutOfBounds(resultArray))){
+        if(!(this.isPieceOutOfBounds(RotatedPiece))){
             console.log('povernuta');
-            this.activePiece.blocks = resultArray;
+            this.activePiece.blocks = RotatedPiece;
         }else{
             console.log('ne povernuta')
         };
     };
-    
-    sleep(milliseconds) {
-        const date = Date.now();
-        let currentDate = null;
-        do {
-            currentDate = Date.now();
-        } while (currentDate - date < milliseconds);
-        this.sleep()
-    };
-
-
 };
