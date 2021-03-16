@@ -1,3 +1,4 @@
+
 export default class View{
     constructor(width,height,rows,columns){
         this.width = width;
@@ -6,6 +7,15 @@ export default class View{
         this.context = this.canvas.getContext("2d");
         this.blockWidth = this.width / columns;
         this.blockHeight = this.height / rows;
+        this.colors = ["#990099","#002699","#260099"];
+        this.secondsPassed;
+        this.oldTimeStamp;
+        this.fps;
+    }
+    randomColors (){
+        const colorCount = this.colors.length;
+        const i = Math.floor(Math.random() * Math.floor(colorCount));
+        return this.colors[i];
     }
     createRect (x,y,width,height,color){
         this.context.fillStyle = color;
@@ -17,12 +27,13 @@ export default class View{
     };
     render(playfield) {
         this.clearScreen();
+        const color = this.randomColors();
         for (let y = 0; y < playfield.length; y++) {
             const line = playfield[y];
             for (let x = 0; x < line.length; x++) {
                 const block = line[x];
                 if (block) {
-                    this.createRect(x,y,this.blockWidth,this.blockHeight,'rgba(255, 0, 0, 0.5)');
+                    this.createRect(x,y,this.blockWidth,this.blockHeight,this.randomColors());
                 };  
             };
         };
