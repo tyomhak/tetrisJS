@@ -1,8 +1,9 @@
 export default class Game {
     constructor(){
         this.score = 0;
-        this.lines = 0;
+        this.lines = 9;
         this.level = 0;
+        this.speed = 1000;
     //     this.playfield = [
     //       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -138,6 +139,8 @@ export default class Game {
         };
         this.LineCheck();
         this.looseCheck();
+        this.difficultyCheck();
+        console.log(this.lines,this.level,this.speed);
         return playfield;
     };
 
@@ -204,7 +207,6 @@ export default class Game {
     };
     rotatePiece(piece){
         let resultArray = [];
-        console.log(piece)
         for (let i = 0; i < piece.length; i++) {
             resultArray.push([])
         };
@@ -235,16 +237,18 @@ export default class Game {
         return activePieceY;
     };
 
-    moveDownEverySecond() {
+    moveDownEverySecond(speed) {
+        let localSpeedvar = speed;
         setInterval(() => {
             this.movePieceDown();
-        }, 1000);
+        }, localSpeedvar);
     };
 
     looseCheck(){
+        //if top row of playfield includes piece of any shape
+        //you will loose.
         const playfield = this.playfield;
         if(playfield[0].includes(1)){
-            console.log(true);
             this.activePiece.blocks = [
                                 [0,0,0],
                                 [0,0,0],
@@ -253,11 +257,24 @@ export default class Game {
         };
     };
 
+    difficultyCheck(){
+        if (this.lines >= 10) { 
+            this.level += 1;
+            this.lines = 0;
+            if (this.speed > 600){
+                this.speed =  /*this.speed - (this.level * 100)*/ 100;
+            };
+        };  
+    };
+
     LineCheck(){
+        //if row is full and no zero in it
+        //row will be deleted from playfield
         const playfield =  this.playfield
         for (let y = 0; y < playfield.length; y++) {
             if (!(playfield[y].includes(0))){
                 playfield.splice(y,1);
+                //adding new empty list in playfield
                 playfield.unshift([0,0,0,0,0,0,0,0,0,0]);
                 this.lines += 1;
             };
