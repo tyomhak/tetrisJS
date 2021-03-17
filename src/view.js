@@ -1,9 +1,11 @@
 
-export default class View{
-    constructor(width,height,rows,columns){
+export {View, ContextView}
+
+class View{
+    constructor(width,height,rows,columns,id){
         this.width = width;
         this.height = height;
-        this.canvas = document.getElementById('gameScreen');
+        this.canvas = document.getElementById(id);
         this.context = this.canvas.getContext("2d");
         this.blockWidth = this.width / columns;
         this.blockHeight = this.height / rows;
@@ -33,7 +35,7 @@ export default class View{
             for (let x = 0; x < line.length; x++) {
                 const block = line[x];
                 if (block) {
-                    this.createRect(x,y,this.blockWidth,this.blockHeight,this.randomColors());
+                    this.createRect(x,y,this.blockWidth,this.blockHeight,'#c44444');
                 };  
             };
         };
@@ -43,4 +45,45 @@ export default class View{
     };
     
   
+};
+
+class ContextView extends View {
+
+    randomPieceField(piece){
+
+        for (let y = 0; y < piece.length; y++) {
+            
+            for (let x = 0; x < piece[y].length; x++) {
+                const block = piece[y][x];
+                if (block) {
+                    this.createRect(x,y,this.blockWidth,this.blockHeight,'#c44444')
+                };
+            }; 
+        };
+    };
+
+
+    RandomPieceMenu(width,height,positionY)
+        {
+            const context = this.context;
+            const positionX = this.width/2 - width/2;
+
+            context.fillStyle = '#C2DFFF';
+            context.fillRect(positionX ,positionY ,width ,height);
+            context.lineWidth = 1;
+            context.strokeStyle = 'black';
+            context.strokeRect(positionX ,positionY ,width,height);
+        };
+    TextDrawing (width,positionY,px){
+        const ctx = this.context;
+        const positionX = this.width/2 - width/2;
+
+        ctx.font = `${px}px Tetris`;
+        ctx.fillStyle = 'black';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText  ('TETRIS', positionX, positionY);
+        
+    };
+    
+    
 };
