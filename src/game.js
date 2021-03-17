@@ -29,8 +29,9 @@ export default class Game {
     //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     // ];
         this.playfield = this.createPlayField();
+        this.colorfield = this.createPlayField();
         this.pieceTemplates = [
-                [
+                [   
                     [0,1,0],
                     [1,1,1],
                     [0,0,0],
@@ -40,12 +41,12 @@ export default class Game {
                     [0,1,1],
                     [0,0,0],
                 ],
-                [
+                [   
                     [0,1,1],
                     [1,1,0],
                     [0,0,0],
                 ],
-                [
+                [   
                     [0,0,0,0],
                     [1,1,1,1],
                     [0,0,0,0],
@@ -56,7 +57,7 @@ export default class Game {
                     [0,1,0],
                     [0,1,0],
                 ],
-                [
+                [   
                     [1,1,0],
                     [0,1,0],
                     [0,1,0],
@@ -70,14 +71,24 @@ export default class Game {
                 
             ];
 
+    this.colors = ["#54C7AB","#87D8EA","#DA16F1","#37F116","#F24B02","#EBE10E"];
+ 
+    this.nextRandomPiece = this.getRandomPiece();
     this.activePiece = {
             x:0,
             y:0,
-            blocks:this.getRandomPiece()
+            blocks:this.getRandomPiece(),
+            nextpiece : this.nextRandomPiece,
+            color: this.getRandomColor(),
+            
         };
-
+    this.lastColor = this.activePiece.color;
     };
-
+    getRandomColor(){
+        const i = this.getRandomInt(this.colors.length);
+        return this.colors[i]
+    };
+    
     getRandomInt(max) {
         return Math.floor(Math.random() * Math.floor(max));
     };
@@ -97,6 +108,8 @@ export default class Game {
         return RandomPiece;
     };
 
+ 
+
     createPlayField(){
         //creating 2d array with 20 rows and 10 columns
     
@@ -113,37 +126,70 @@ export default class Game {
     newActivePiece(){
         this.activePiece.x = this.getRandomInt(6);
         this.activePiece.y = 0;
-        this.activePiece.blocks = this.getRandomPiece();
+        this.activePiece.blocks = this.activePiece.nextpiece;
+        this.activePiece.nextpiece = this.getRandomPiece();
+        this.activePiece.color = this.getRandomColor();
     };
+
+    // nextRandomPieceCounter(){
+    //     if(this.nextRandomPiece.pieceCount == 0){
+    //         this.nextRandomPiece.piece = this.getRandomPiece();
+    //         this.nextRandomPiece.pieceCount = 1;
+    //     };
+    // };
 
     getState(){
         //creating new playfield
         const playfield = this.createPlayField();
-        let {y : pieceY, x : pieceX , blocks : blocks} = this.activePiece;
+        const colorfield  = this.createPlayField();
+
+        let {y : pieceY, x : pieceX , blocks : blocks , color:color} = this.activePiece;
+        
         //local plafield equal to this.playfield
+        for (let y = 0; y < this.colorfield.length; y++) {
+            for (let x = 0; x < this.colorfield[y].length; x++) {
+                let element = this.colorfield[y][x];
+                if(element == 1){
+                    this.colorfield[y][x] = this.lastColor;
+                };
+            };
+        };
+        
         for (let y = 0; y < playfield.length; y++) {
             const block = playfield[y];
             for (let x = 0; x < block.length; x++) {
                 playfield[y][x] = this.playfield[y][x];
+                if(this.colorfield[y][x] == 0){
+                    this.colorfield[y][x] = this.playfield[y][x]
+                };
             };
         };
+
+        this.looseCheck();
+
         //adding active piece in playfield using activePiece.x and y coordinates
-        const randomInt  = this.getRandomInt(6);
+
+        
 
         for (let y = 0; y < blocks.length; y++) {
             for (let x = 0; x < blocks[y].length; x++) {
                 if(blocks[y][x]){
                     playfield[pieceY+y][pieceX+x] = blocks[y][x];
+                    
                 };
             };
         };
+
+        
+
         this.LineCheck();
         this.looseCheck();
         this.difficultyCheck();
-        console.log(this.lines,this.level,this.speed);
+        
+        // console.log(this.lines,this.level,this.speed);
         return playfield;
     };
-
+    
     movePieceLeft(){
         //moving piece left 
         const blocks = this.activePiece.blocks;
@@ -202,6 +248,8 @@ export default class Game {
             };
             
         };
+        this.lastColor = this.activePiece.color;
+
         this.newActivePiece();
 
     };
@@ -248,7 +296,7 @@ export default class Game {
         //if top row of playfield includes piece of any shape
         //you will loose.
         const playfield = this.playfield;
-        if(playfield[0].includes(1)){
+        if(playfield[3].includes(1)){
             this.activePiece.blocks = [
                                 [0,0,0],
                                 [0,0,0],
@@ -271,11 +319,14 @@ export default class Game {
         //if row is full and no zero in it
         //row will be deleted from playfield
         const playfield =  this.playfield
+        const row = [0,0,0,0,0,0,0,0,0,0]
         for (let y = 0; y < playfield.length; y++) {
             if (!(playfield[y].includes(0))){
                 playfield.splice(y,1);
+                this.colorfield.splice(y,1);
                 //adding new empty list in playfield
-                playfield.unshift([0,0,0,0,0,0,0,0,0,0]);
+                playfield.unshift(row);
+                this.colorfield.unshift(row);
                 this.lines += 1;
             };
         };
