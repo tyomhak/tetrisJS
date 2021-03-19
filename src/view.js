@@ -14,6 +14,16 @@ class View{
         this.oldTimeStamp;
         this.fps;
     }
+
+    drawLine(){
+        const ctx = this.context;
+        ctx.beginPath();
+ 
+        ctx.lineTo(0, 90);
+        ctx.lineTo(this.width, 90);
+        ctx.stroke();
+
+    }
     randomColors (){
         const colorCount = this.colors.length;
         const i = Math.floor(Math.random() * Math.floor(colorCount));
@@ -27,7 +37,7 @@ class View{
         this.context.strokeRect(x * width ,y * height ,width,height);
        
     };
-    render(playfield,piece) {
+    render(playfield,colorfield,piece) {
         this.clearScreen();
         const color = this.randomColors();
         for (let y = 0; y < playfield.length; y++) {
@@ -39,6 +49,8 @@ class View{
                 };
             };
         };
+        this.renderColor(colorfield);
+        this.drawLine();
     };
 
     renderColor(colorField){
@@ -85,7 +97,7 @@ class ContextView extends View {
             for (let x = 0; x < nextPieceGrid[y].length; x++) {
                 const block = nextPieceGrid[y][x];
                 if (block) {
-                    this.createRect(3+x,11.4+y,this.blockWidth,this.blockHeight,color)
+                    this.createRect(3+x,11.4+y,this.blockWidth,this.blockHeight,'blue')
                 };
                 if(!(block)){
                     this.createRect(3+x,11.4+y,this.blockWidth,this.blockHeight,'white')
@@ -96,7 +108,7 @@ class ContextView extends View {
 
 
     RandomPieceMenu(width,height,positionY){   
-        this.clearScreen();
+
         const context = this.context;
         const positionX = this.width/2 - width/2;
 
@@ -117,6 +129,21 @@ class ContextView extends View {
         ctx.fillText  (text, positionX, positionY);
         
     };
+
+    render(){
+        this.clearScreen();
+        this.RandomPieceMenu(200,200,200);
+        this.TextDrawing('Next Piece',210,200,40);
+        this.TextDrawing(`Level = ${game.level}`,210,500,20);
+    
+
+        this.TextDrawing(`Score = ${game.score}`,210,530,20);
+        this.TextDrawing(`Lines deleted = ${game.lines}`,210,560,20);
+        this.TextDrawing(`Press "R" to restart`,210,640,20);
+
+        this.randomPieceField(game.activePiece.nextpiece,game.activePiece.color);
+        this.drawLine();
+    }
 
     
     
