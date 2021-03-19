@@ -21,15 +21,15 @@ window.requestAnimationFrame(gameLoop);
 function gameLoop() {
     
 
-    view.render(game.getState(),game.activePiece.color);
-    view.renderColor(game.colorfield);
+    view.render(game.getState(),game.colorfield,game.activePiece.color);
+
+
+    view2.render();
     window.requestAnimationFrame(gameLoop);
-    view2.RandomPieceMenu(200,200,200);
-    view2.TextDrawing('Next Piece',210,200,40);
-    view2.randomPieceField(game.activePiece.nextpiece,"blue");
+
 };
 game.moveDownEverySecond(game.speed);
 
-
+console.log(view.canvas.getBoundingClientRect())
 // move the active piece down every second
 
