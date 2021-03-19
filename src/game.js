@@ -36,6 +36,11 @@ export default class Game {
                     [1,1,1],
                     [0,0,0],
                 ],
+                [   
+                    [1,0,0],
+                    [0,1,0],
+                    [0,0,1],
+                ],
                 [
                     [1,1,0],
                     [0,1,1],
@@ -50,6 +55,12 @@ export default class Game {
                     [0,0,0,0],
                     [1,1,1,1],
                     [0,0,0,0],
+                    [0,0,0,0],
+                ],
+                [   
+                    [0,0,0,0],
+                    [0,1,1,0],
+                    [1,0,0,1],
                     [0,0,0,0],
                 ],
                 [
@@ -73,16 +84,20 @@ export default class Game {
 
     this.colors = ["#54C7AB","#87D8EA","#DA16F1","#37F116","#F24B02","#EBE10E"];
  
-    this.nextRandomPiece = this.getRandomPiece();
+    this.nextRandomPiece = this.getRandomPiece(),
+    this.colorCount  = 0;
+                        
+
+
     this.activePiece = {
-            x:0,
+            x:this.getRandomInt(6),
             y:0,
             blocks:this.getRandomPiece(),
             nextpiece : this.nextRandomPiece,
             color: this.getRandomColor(),
             
         };
-    this.lastColor = this.activePiece.color;
+
     };
     getRandomColor(){
         const i = this.getRandomInt(this.colors.length);
@@ -128,7 +143,8 @@ export default class Game {
         this.activePiece.y = 0;
         this.activePiece.blocks = this.activePiece.nextpiece;
         this.activePiece.nextpiece = this.getRandomPiece();
-        this.activePiece.color = this.getRandomColor();
+        this.colorCount = 0;
+        
     };
 
     // nextRandomPieceCounter(){
@@ -139,34 +155,26 @@ export default class Game {
     // };
 
     getState(){
+        this.looseCheck();
         //creating new playfield
         const playfield = this.createPlayField();
-        const colorfield  = this.createPlayField();
+        const colorfield = this.createPlayField();
 
         let {y : pieceY, x : pieceX , blocks : blocks , color:color} = this.activePiece;
+
         
         //local plafield equal to this.playfield
         for (let y = 0; y < this.colorfield.length; y++) {
             for (let x = 0; x < this.colorfield[y].length; x++) {
-                let element = this.colorfield[y][x];
+                let element = this.playfield[y][x];
                 if(element == 1){
-                    this.colorfield[y][x] = this.lastColor;
+                    if(typeof(this.colorfield[y][x]) != 'string'){
+                        this.colorfield[y][x] = color;
+                    }
                 };
             };
         };
-        
-        for (let y = 0; y < playfield.length; y++) {
-            const block = playfield[y];
-            for (let x = 0; x < block.length; x++) {
-                playfield[y][x] = this.playfield[y][x];
-                if(this.colorfield[y][x] == 0){
-                    this.colorfield[y][x] = this.playfield[y][x]
-                };
-            };
-        };
-
-        this.looseCheck();
-
+      
         //adding active piece in playfield using activePiece.x and y coordinates
 
         
@@ -175,7 +183,6 @@ export default class Game {
             for (let x = 0; x < blocks[y].length; x++) {
                 if(blocks[y][x]){
                     playfield[pieceY+y][pieceX+x] = blocks[y][x];
-                    
                 };
             };
         };
@@ -183,11 +190,14 @@ export default class Game {
         
 
         this.LineCheck();
-        this.looseCheck();
-        this.difficultyCheck();
-        
+
+        if (this.colorCount == 0){
+            this.activePiece.color = this.getRandomColor();
+            this.colorCount = 1;
+        }
         // console.log(this.lines,this.level,this.speed);
         return playfield;
+
     };
     
     movePieceLeft(){
@@ -210,7 +220,10 @@ export default class Game {
             this.activePiece.y -= 1;
             //while piece is on the another piece or if piece is on the bottom
             //down arrow pressing will immediately lock the piece and call next piece
+
             this.lockPiece();
+            
+           
         };
     };
     
@@ -244,15 +257,16 @@ export default class Game {
         const playfield = this.playfield;
         for (let y = 0; y < blocks.length; y++) {
             for (let x = 0; x < blocks[y].length; x++) {
-                if(blocks[y][x]) playfield[pieceY + y][pieceX + x]  = blocks[y][x];
+                if(blocks[y][x]) playfield[pieceY + y][pieceX + x] = blocks[y][x];
             };
             
         };
-        this.lastColor = this.activePiece.color;
-
+        
         this.newActivePiece();
 
+
     };
+
     rotatePiece(piece){
         let resultArray = [];
         for (let i = 0; i < piece.length; i++) {
@@ -296,7 +310,7 @@ export default class Game {
         //if top row of playfield includes piece of any shape
         //you will loose.
         const playfield = this.playfield;
-        if(playfield[3].includes(1)){
+        if(playfield[2].includes(1)){
             this.activePiece.blocks = [
                                 [0,0,0],
                                 [0,0,0],
@@ -312,7 +326,7 @@ export default class Game {
             if (this.speed > 600){
                 this.speed =  /*this.speed - (this.level * 100)*/ 100;
             };
-        };  
+        };
     };
 
     LineCheck(){
@@ -328,8 +342,21 @@ export default class Game {
                 playfield.unshift(row);
                 this.colorfield.unshift(row);
                 this.lines += 1;
+
+                this.score += 10;
             };
         };
         return playfield;
+    };
+    replay(){
+        this.playfield = this.createPlayField();
+        this.colorfield = this.createPlayField();
+        this.activePiece.x = this.getRandomInt(6)
+        this.activePiece.y = 0;
+        this.activePiece.blocks = this.getRandomPiece();
+        
+        this.lines = 0;
+        this.score = 0;
+        this.speed = 1000;
     };
 };
