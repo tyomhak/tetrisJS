@@ -1,10 +1,12 @@
 export default class Game {
     constructor(){
+
+        this.lines = 0;
         this.score = 0;
-        this.lines = 9;
+        this.record = 0;
         this.level = 0;
         this.speed = 1000;
-        this.colors = ["#990099","#002699","#00f51d", "#f50000"];
+        //debugging field :D
     //     this.playfield = [
     //       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -30,35 +32,46 @@ export default class Game {
     //     , [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     // ];
         this.playfield = this.createPlayField();
-        this.playfield_colors = this.createPlayField();
+        this.colorfield = this.createPlayField();
         this.pieceTemplates = [
-                [
+                [   
                     [0,1,0],
                     [1,1,1],
                     [0,0,0],
                 ],
+                [   
+                    [1,0,0],
+                    [0,1,0],
+                    [0,0,1],
+                ],
                 [
                     [1,1,0],
                     [0,1,1],
                     [0,0,0],
                 ],
-                [
+                [   
                     [0,1,1],
                     [1,1,0],
                     [0,0,0],
                 ],
-                [
+                [   
                     [0,0,0,0],
                     [1,1,1,1],
                     [0,0,0,0],
                     [0,0,0,0],
                 ],
+                [   
+                    [0,0,0,0],
+                    [0,1,1,0],
+                    [1,0,0,1],
+                    [0,0,0,0],
+                ],
                 [
                     [0,1,1],
                     [0,1,0],
                     [0,1,0],
                 ],
-                [
+                [   
                     [1,1,0],
                     [0,1,0],
                     [0,1,0],
@@ -69,18 +82,34 @@ export default class Game {
                     [0,1,1,0],
                     [0,0,0,0],
                 ],
+             
                 
             ];
 
+    this.colors = ["#54C7AB","#87D8EA","#DA16F1","#37F116","#F24B02","#EBE10E"];
+ 
+    this.nextRandomPiece = this.getRandomPiece(),
+    this.colorCount  = 0;
+    
+
+
     this.activePiece = {
-            x:0,
+            x:this.getRandomInt(6),
             y:0,
             blocks:this.getRandomPiece(),
-            color:this.getRandomColor()
+            nextpiece : this.nextRandomPiece,
+            color: this.getRandomColor(),
         };
 
+    this.intervalCount = 0;
+    this.interval;
     };
-
+    
+    getRandomColor(){
+        const i = this.getRandomInt(this.colors.length);
+        return this.colors[i]
+    };
+    
     getRandomInt(max) {
         return Math.floor(Math.random() * Math.floor(max));
     };
@@ -104,6 +133,8 @@ export default class Game {
         return RandomPiece;
     };
 
+ 
+
     createPlayField(){
         //creating 2d array with 20 rows and 10 columns
     
@@ -120,23 +151,41 @@ export default class Game {
     newActivePiece(){
         this.activePiece.x = this.getRandomInt(6);
         this.activePiece.y = 0;
-        this.activePiece.blocks = this.getRandomPiece();
-        this.activePiece.color = this.getRandomColor();
+        this.activePiece.blocks = this.activePiece.nextpiece;
+        this.activePiece.nextpiece = this.getRandomPiece();
+        this.colorCount = 0;
     };
 
+    // nextRandomPieceCounter(){
+    //     if(this.nextRandomPiece.pieceCount == 0){
+    //         this.nextRandomPiece.piece = this.getRandomPiece();
+    //         this.nextRandomPiece.pieceCount = 1;
+    //     };
+    // };
+
     getState(){
+        this.looseCheck();
         //creating new playfield
         const playfield = this.createPlayField();
-        let {y : pieceY, x : pieceX , blocks : blocks} = this.activePiece;
+        const colorfield = this.createPlayField();
+        this.moveDownEverySecond(this.speed);
+        let {y : pieceY, x : pieceX , blocks : blocks , color:color} = this.activePiece;
+     
         //local plafield equal to this.playfield
-        for (let y = 0; y < playfield.length; y++) {
-            const block = playfield[y];
-            for (let x = 0; x < block.length; x++) {
-                playfield[y][x] = this.playfield[y][x];
+        for (let y = 0; y < this.colorfield.length; y++) {
+            for (let x = 0; x < this.colorfield[y].length; x++) {
+                let element = this.playfield[y][x];
+                if(element == 1){
+                    if(typeof(this.colorfield[y][x]) != 'string'){
+                        this.colorfield[y][x] = color;
+                    }
+                };
             };
         };
+      
         //adding active piece in playfield using activePiece.x and y coordinates
-        const randomInt  = this.getRandomInt(6);
+
+        
 
         for (let y = 0; y < blocks.length; y++) {
             for (let x = 0; x < blocks[y].length; x++) {
@@ -145,34 +194,19 @@ export default class Game {
                 };
             };
         };
+
+        
+
         this.LineCheck();
-        this.looseCheck();
-        this.difficultyCheck();
-        console.log(this.lines,this.level,this.speed);
+
+        if (this.colorCount == 0){
+            this.activePiece.color = this.getRandomColor();
+            this.colorCount = 1;
+        }
+        // console.log(this.lines,this.level,this.speed);
         return playfield;
+
     };
-
-    getColors(){
-        const playfield_col = this.createPlayField();
-
-        let {y : pieceY, x : pieceX , blocks : blocks} = this.activePiece;
-        //local plafield equal to this.playfield
-        for (let y = 0; y < this.playfield_colors.length; y++) {
-            for (let x = 0; x < this.playfield_colors[0].length; x++) {
-                playfield_col[y][x] = this.playfield_colors[y][x];
-            };
-        };
-
-        for (let y = 0; y < blocks.length; y++) {
-            for (let x = 0; x < blocks[y].length; x++) {
-                if(blocks[y][x]){
-                    playfield_col[pieceY+y][pieceX+x] = this.activePiece.color;
-                };
-            };
-        };
-
-        return playfield_col;
-    }
 
     movePieceLeft(){
         //moving piece left 
@@ -194,7 +228,10 @@ export default class Game {
             this.activePiece.y -= 1;
             //while piece is on the another piece or if piece is on the bottom
             //down arrow pressing will immediately lock the piece and call next piece
+
             this.lockPiece();
+            
+           
         };
     };
     
@@ -228,16 +265,16 @@ export default class Game {
         const playfield = this.playfield;
         for (let y = 0; y < blocks.length; y++) {
             for (let x = 0; x < blocks[y].length; x++) {
-                if(blocks[y][x]) {
-                    playfield[pieceY + y][pieceX + x]  = blocks[y][x];
-                    this.playfield_colors[pieceY + y][pieceX + x] = this.activePiece.color;
-                }
-
+                if(blocks[y][x]) playfield[pieceY + y][pieceX + x] = blocks[y][x];
             };
             
         };
+        
         this.newActivePiece();
+
+
     };
+
     rotatePiece(piece){
         let resultArray = [];
         for (let i = 0; i < piece.length; i++) {
@@ -271,17 +308,23 @@ export default class Game {
     };
 
     moveDownEverySecond(speed) {
-        let localSpeedvar = speed;
-        setInterval(() => {
-            this.movePieceDown();
-        }, localSpeedvar);
+        if (this.intervalCount == 0)
+            {
+                this.interval = setInterval(() => {
+                    this.movePieceDown();
+                },speed)
+                this.intervalCount = 1;
+                console.log('nigar ?')
+            };
+        
+
     };
 
     looseCheck(){
         //if top row of playfield includes piece of any shape
         //you will loose.
         const playfield = this.playfield;
-        if(playfield[0].includes(1)){
+        if(playfield[2].includes(1)){
             this.activePiece.blocks = [
                                 [0,0,0],
                                 [0,0,0],
@@ -290,28 +333,62 @@ export default class Game {
         };
     };
 
-    difficultyCheck(){
-        if (this.lines >= 10) { 
-            this.level += 1;
-            this.lines = 0;
-            if (this.speed > 600){
-                this.speed =  /*this.speed - (this.level * 100)*/ 100;
-            };
-        };  
+    IntervalControl(speed){
+        clearInterval(this.interval);
+        this.intervalCount = 0;
+        this.moveDownEverySecond(speed);
     };
 
     LineCheck(){
         //if row is full and no zero in it
         //row will be deleted from playfield
         const playfield =  this.playfield
+        
         for (let y = 0; y < playfield.length; y++) {
             if (!(playfield[y].includes(0))){
+                const row = [0,0,0,0,0,0,0,0,0,0]
                 playfield.splice(y,1);
+                this.colorfield.splice(y,1);
                 //adding new empty list in playfield
-                playfield.unshift([0,0,0,0,0,0,0,0,0,0]);
+                playfield.unshift(row);
+                this.colorfield.unshift(row);
+                //some stats getting increased;
                 this.lines += 1;
+                
+
+                this.score += 10;
+                
+                this.level = Math.floor(this.score / 100);
+                if(this.speed > 200){
+                    this.speed = 1000 - (this.level * 400)
+                }
+                
+                this.IntervalControl(this.speed);
+                this.recordCounter();
             };
         };
         return playfield;
+    };
+    // speedIncrease(){
+    //     if 
+    // }
+    replay(){
+        this.playfield = this.createPlayField();
+        this.colorfield = this.createPlayField();
+        this.activePiece.x = this.getRandomInt(6)
+        this.activePiece.y = 0;
+        this.activePiece.blocks = this.getRandomPiece();
+        this.level = 0;
+        this.lines = 0;
+        this.score = 0;
+        this.speed = 1000;
+        this.IntervalControl(this.speed);
+    };
+
+
+    recordCounter(){
+        if (this.score > this.record){
+            this.record = this.score;
+        };
     };
 };

@@ -5,7 +5,7 @@ export default class InputHandler {
         this.up = up;
         this.down = down;
         document.addEventListener("keydown" , event => {
-
+            
             switch(event.keyCode) {
                 case this.left:
                     game.movePieceLeft();
@@ -22,8 +22,11 @@ export default class InputHandler {
                 case this.up:
                     game.blocksRotateToRight();
                     break;
+                case 82:
+                    game.replay();
+                    break;
             };
-            view.render(game.getState(), game.getColors());
+            view.render(game.getState(),game.colorfield);
         });
     };
 };

@@ -1,5 +1,32 @@
 #gameScreen {
     border: 1px solid black;
+    padding: 0;
+
+    
+}
+#gameScreen2{
+    border :1px solid black;
+}
+
+@font-face {
+    font-family: 'Tetris';
+    src: url("./font/Tetris.ttf") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+    
+}
+
+.header{
+    position:sticky;
+    font-size: 100px;
+    font-family: 'Tetris';
+    color: black;
+    width: auto;
+    height: 260px;
+    background-color: white;
 
 
+}
+.canvas {
+    margin-top: -90px;
 }
