@@ -1,7 +1,9 @@
 export default class Game {
     constructor(){
+
+        this.lines = 0;
         this.score = 0;
-        this.lines = 9;
+        this.record = 0;
         this.level = 0;
         this.speed = 1000;
     //     this.playfield = [
@@ -31,54 +33,55 @@ export default class Game {
         this.playfield = this.createPlayField();
         this.colorfield = this.createPlayField();
         this.pieceTemplates = [
-                [   
-                    [0,1,0],
-                    [1,1,1],
-                    [0,0,0],
-                ],
-                [   
-                    [1,0,0],
-                    [0,1,0],
-                    [0,0,1],
-                ],
-                [
-                    [1,1,0],
-                    [0,1,1],
-                    [0,0,0],
-                ],
-                [   
-                    [0,1,1],
-                    [1,1,0],
-                    [0,0,0],
-                ],
+                // [   
+                //     [0,1,0],
+                //     [1,1,1],
+                //     [0,0,0],
+                // ],
+                // [   
+                //     [1,0,0],
+                //     [0,1,0],
+                //     [0,0,1],
+                // ],
+                // [
+                //     [1,1,0],
+                //     [0,1,1],
+                //     [0,0,0],
+                // ],
+                // [   
+                //     [0,1,1],
+                //     [1,1,0],
+                //     [0,0,0],
+                // ],
                 [   
                     [0,0,0,0],
                     [1,1,1,1],
                     [0,0,0,0],
                     [0,0,0,0],
                 ],
-                [   
-                    [0,0,0,0],
-                    [0,1,1,0],
-                    [1,0,0,1],
-                    [0,0,0,0],
-                ],
-                [
-                    [0,1,1],
-                    [0,1,0],
-                    [0,1,0],
-                ],
-                [   
-                    [1,1,0],
-                    [0,1,0],
-                    [0,1,0],
-                ],
-                [   
-                    [0,0,0,0],
-                    [0,1,1,0],
-                    [0,1,1,0],
-                    [0,0,0,0],
-                ],
+                // [   
+                //     [0,0,0,0],
+                //     [0,1,1,0],
+                //     [1,0,0,1],
+                //     [0,0,0,0],
+                // ],
+                // [
+                //     [0,1,1],
+                //     [0,1,0],
+                //     [0,1,0],
+                // ],
+                // [   
+                //     [1,1,0],
+                //     [0,1,0],
+                //     [0,1,0],
+                // ],
+                // [   
+                //     [0,0,0,0],
+                //     [0,1,1,0],
+                //     [0,1,1,0],
+                //     [0,0,0,0],
+                // ],
+             
                 
             ];
 
@@ -86,7 +89,7 @@ export default class Game {
  
     this.nextRandomPiece = this.getRandomPiece(),
     this.colorCount  = 0;
-                        
+    
 
 
     this.activePiece = {
@@ -98,7 +101,10 @@ export default class Game {
             
         };
 
+    this.intervalCount = 0;
+    this.interval;
     };
+    
     getRandomColor(){
         const i = this.getRandomInt(this.colors.length);
         return this.colors[i]
@@ -159,10 +165,9 @@ export default class Game {
         //creating new playfield
         const playfield = this.createPlayField();
         const colorfield = this.createPlayField();
-
+        this.moveDownEverySecond(this.speed);
         let {y : pieceY, x : pieceX , blocks : blocks , color:color} = this.activePiece;
-
-        
+     
         //local plafield equal to this.playfield
         for (let y = 0; y < this.colorfield.length; y++) {
             for (let x = 0; x < this.colorfield[y].length; x++) {
@@ -300,10 +305,16 @@ export default class Game {
     };
 
     moveDownEverySecond(speed) {
-        let localSpeedvar = speed;
-        setInterval(() => {
-            this.movePieceDown();
-        }, localSpeedvar);
+        if (this.intervalCount == 0)
+            {
+                this.interval = setInterval(() => {
+                    this.movePieceDown();
+                },speed)
+                this.intervalCount = 1;
+                console.log('nigar ?')
+            };
+        
+
     };
 
     looseCheck(){
@@ -319,44 +330,62 @@ export default class Game {
         };
     };
 
-    difficultyCheck(){
-        if (this.lines >= 10) { 
-            this.level += 1;
-            this.lines = 0;
-            if (this.speed > 600){
-                this.speed =  /*this.speed - (this.level * 100)*/ 100;
-            };
-        };
+    IntervalControl(speed){
+        clearInterval(this.interval);
+        this.intervalCount = 0;
+        this.moveDownEverySecond(speed);
     };
 
     LineCheck(){
         //if row is full and no zero in it
         //row will be deleted from playfield
         const playfield =  this.playfield
-        const row = [0,0,0,0,0,0,0,0,0,0]
+        
         for (let y = 0; y < playfield.length; y++) {
             if (!(playfield[y].includes(0))){
+                const row = [0,0,0,0,0,0,0,0,0,0]
                 playfield.splice(y,1);
                 this.colorfield.splice(y,1);
                 //adding new empty list in playfield
                 playfield.unshift(row);
                 this.colorfield.unshift(row);
+                //some stats getting increased;
                 this.lines += 1;
+                
 
                 this.score += 10;
+                
+                this.level = Math.floor(this.score / 100);
+                if(this.speed > 200){
+                    this.speed = 1000 - (this.level * 400)
+                }
+                
+                this.IntervalControl(this.speed);
+                this.recordCounter();
             };
         };
         return playfield;
     };
+    // speedIncrease(){
+    //     if 
+    // }
     replay(){
         this.playfield = this.createPlayField();
         this.colorfield = this.createPlayField();
         this.activePiece.x = this.getRandomInt(6)
         this.activePiece.y = 0;
         this.activePiece.blocks = this.getRandomPiece();
-        
+        this.level = 0;
         this.lines = 0;
         this.score = 0;
         this.speed = 1000;
+        this.IntervalControl(this.speed);
+    };
+
+
+    recordCounter(){
+        if (this.score > this.record){
+            this.record = this.score;
+        };
     };
 };
