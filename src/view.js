@@ -134,7 +134,11 @@ class ContextView extends View {
         this.clearScreen();
         this.RandomPieceMenu(200,200,200);
         this.TextDrawing('Next Piece',210,200,40);
+       
+        this.TextDrawing(`Record = ${game.record}`,210,470,24);
+
         this.TextDrawing(`Level = ${game.level}`,210,500,20);
+    
     
 
         this.TextDrawing(`Score = ${game.score}`,210,530,20);
