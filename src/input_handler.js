@@ -26,7 +26,7 @@ export default class InputHandler {
                     game.replay();
                     break;
             };
-            view.render(game.getState(),game.colorfield,game.activePiece.color);
+            view.render(game.getState(),game.colorfield);
         });
     };
 };
