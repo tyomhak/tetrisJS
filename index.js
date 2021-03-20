@@ -28,8 +28,6 @@ function gameLoop() {
     window.requestAnimationFrame(gameLoop);
 
 };
-game.moveDownEverySecond(game.speed);
 
-console.log(view.canvas.getBoundingClientRect())
 // move the active piece down every second
 
